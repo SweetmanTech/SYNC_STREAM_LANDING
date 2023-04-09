@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css"
 import { MusicGameProvider } from "../providers/MusicGameProvider"
 
 const { chains, provider, webSocketProvider } = configureChains(
-  allChains.filter((c) => c.id === Number(process.env.NEXT_PUBLIC_CHAIN_ID)),
+  allChains.filter((c) => c.id === Number(process.env.NEXT_PUBLIC_CHAIN_ID || 1)),
   [publicProvider()],
 )
 
