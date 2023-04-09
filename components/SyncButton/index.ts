@@ -1,3 +1,3 @@
-import SyncButton from "./SyncButton";
+import SyncButton from "./SyncButton"
 
 export default SyncButton
