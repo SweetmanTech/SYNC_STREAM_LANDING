@@ -2,7 +2,7 @@ const Button = ({ children, onClick, disabled = false }: any) => (
   <button
     type="button"
     onClick={onClick}
-    className="bg-white text-black py-5 px-[80px] rounded-full hover:bg-opacity-80 max-h-20"
+    className="bg-black text-white text-5xl font-bold py-4 px-8 rounded-2xl hover:bg-opacity-80"
     disabled={disabled}
   >
     {children}
