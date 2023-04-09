@@ -17,10 +17,7 @@ const GameScreen = () => {
 
   const onSubmit = async () => {
     setLoading(true)
-    console.log("spotifyLink", spotifyLink)
     const trackId = getTrackId(spotifyLink)
-
-    console.log("trackId", trackId)
     await router.push(`https://moonwalk-game.herokuapp.com/?spotifyTrackId=${trackId}`)
     setLoading(false)
   }
