@@ -1,135 +1,63 @@
-import { useCallback, useEffect, useState, useMemo } from "react"
-import axios from "axios"
-import MintButton from "../MintButton"
-import { MUSIC_URLS } from "../../lib/consts"
-import MediaControls from "./components/MediaControls"
-import MusicTrackIcon from "../Icons/MusicTrackIcon"
-import { IChecked, IOption } from "./GameScreenTypes"
+import Image from "next/image"
+import { useRouter } from "next/router"
+import React, { useState } from "react"
+import Button from "../Button"
 
-const GameScreen = ({ onSuccess }: any) => {
-  const [loadingAssets, setLoadingAssets] = useState<boolean>(true)
-  const context = useMemo(() => new AudioContext(), [])
-  const bufferSources = useMemo(() => [], [])
-  const [choices, setChoices] = useState<Array<string>>([])
-  const [checked, setChecked] = useState<IChecked>({
-    drums: false,
-    vocal: false,
-    bass: false,
-    guitar: false,
-  })
-  const [playAudio, setPlayAudio] = useState<boolean>(false)
-  const [chosenAudioTracks, setChosenAudioTrack] = useState<Array<string>>([])
-  const [options, setOptions] = useState<IOption[]>([
-    { id: "bass", name: "Bass", imgUrl: "/bass.png", musicUrl: MUSIC_URLS.bass[0] },
-    { id: "drums", name: "Drums", imgUrl: "/drums.png", musicUrl: MUSIC_URLS.drums[0] },
-    { id: "guitar", name: "Guitar", imgUrl: "/guitar.png", musicUrl: MUSIC_URLS.guitar[0] },
-    { id: "vocal", name: "Vocals", imgUrl: "/vocal.png", musicUrl: MUSIC_URLS.vocal[0] },
-  ])
+const GameScreen = () => {
+  const [spotifyLink, setSpotifyLink] = useState("")
+  const router = useRouter()
 
-  const getStakedTracks = useCallback(async () => {
-    const { data: newOptions } = await axios.get("/api/getStakedTracks")
-    setOptions([...options, ...newOptions])
-    setLoadingAssets(false)
-  }, [options])
-
-  useEffect(() => {
-    if (loadingAssets) {
-      getStakedTracks()
-    }
-  }, [loadingAssets, getStakedTracks])
-
-  const stopAudio = useCallback(() => {
-    setPlayAudio(false)
-    context.suspend()
-    bufferSources.forEach((source) => {
-      source.stop()
-    })
-  }, [bufferSources, context])
-
-  const onClickHandler = (value: string, musicUrl: string) => {
-    if (choices.includes(value)) {
-      setChoices([...choices.filter((e) => e !== value)])
-      stopAudio()
-      setChosenAudioTrack([...chosenAudioTracks.filter((e) => e !== musicUrl)])
-    } else {
-      setChoices([...choices, value])
-      stopAudio()
-      setChosenAudioTrack([...chosenAudioTracks, musicUrl])
-    }
-    setChecked({ ...checked, [value]: !checked[value] })
+  const onSubmit = () => {
+    const trackId = "0PS5LgbBgRssKAx5ZUZoD5"
+    router.push(`https://moonwalk-game.herokuapp.com/?spotifyTrackId=${trackId}`)
   }
-  const play = useCallback(
-    (audioBuffer: AudioBuffer) => {
-      const source = context.createBufferSource()
-      bufferSources.push(source)
-      source.buffer = audioBuffer
-      source.connect(context.destination)
-      source.start()
-    },
-    [context, bufferSources],
-  )
-  const fetchAudio = useCallback(
-    async (url: string) => {
-      const response = await fetch(url)
-      const arrayBuffer = await response.arrayBuffer()
-      const audioBuffer = await context.decodeAudioData(arrayBuffer)
-      return audioBuffer
-    },
-    [context],
-  )
-  const playTracks = useCallback(() => {
-    chosenAudioTracks.forEach((track) => {
-      fetchAudio(track).then((audioBuffer) => {
-        play(audioBuffer)
-      })
-    })
-  }, [chosenAudioTracks, fetchAudio, play])
 
-  const MediaControlHandler = (isPlaying: boolean) => {
-    if (isPlaying) {
-      stopAudio()
-    } else {
-      setPlayAudio(true)
-      context.resume()
+  const handleInputChange = (event) => {
+    setSpotifyLink(event.target.value)
+  }
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      onSubmit()
     }
   }
-  useEffect(() => {
-    if (chosenAudioTracks.length === 0) {
-      setPlayAudio(false)
-      stopAudio()
-    }
-  }, [chosenAudioTracks, bufferSources, stopAudio])
-  useEffect(() => {
-    if ((chosenAudioTracks.length, playAudio)) {
-      playTracks()
-    }
-    if (!playAudio && chosenAudioTracks.length > 0 && context.state === "suspended") {
-      stopAudio()
-    }
-  }, [chosenAudioTracks, fetchAudio, playTracks, playAudio, context, stopAudio])
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 align-center">
-      <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">
-        Pick any music, you can click play to hear possible choice.
+    <div>
+      <div className="flex justify-start items-center p-4">
+        <Image src="/images/logo.png" alt="Logo" width={202.5} height={37.5} />
       </div>
-      <div className="flex flex-wrap overflow-x-auto">
-        {options.map((option) => (
-          <MusicTrackIcon
-            key={option.id}
-            option={option}
-            checked={checked}
-            onClickHandler={onClickHandler}
-            loadingAssets={loadingAssets}
-          />
-        ))}
+      <div className="flex flex-col items-center justify-center mt-10">
+        <h1 className="text-2xl font-bold text-center">Increase streams up to 10x</h1>
+        <h1 className="text-2xl font-bold text-center">Turn any song into a video game.</h1>
+        <h1 className="text-2xl font-bold text-center">Link content, select game, sync streams.</h1>
       </div>
-      <div className="flex flex-row-reverse gap-4">
-        {chosenAudioTracks.length > 0 && (
-          <MediaControls playAudio={playAudio} MediaControlHandler={MediaControlHandler} />
-        )}
-        {choices.length > 1 && (
-          <MintButton onSuccess={onSuccess} audioTracksToMix={chosenAudioTracks} />
-        )}
+      <div className="flex items-center justify-center mt-8">
+        <input
+          className="border border-gray-300 rounded-lg py-2 px-4 w-full max-w-lg"
+          placeholder="Enter Spotify Song Link Here"
+          value={spotifyLink}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+        />
+      </div>
+      <div className="flex items-center justify-center mt-8">
+        <Image
+          className="rounded-md mx-2"
+          src="/images/game-options.png"
+          alt="Game 1"
+          width={657}
+          height={210}
+        />
+      </div>
+      <div className="flex items-center justify-center mt-8">
+        <Button
+          type="button"
+          className="bg-blue-500 hover:bg-blue-700 text-white text-7xl font-bold py-2 px-4 rounded"
+          onClick={() => onSubmit()}
+        >
+          Sync
+        </Button>
       </div>
     </div>
   )
