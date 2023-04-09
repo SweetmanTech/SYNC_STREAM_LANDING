@@ -1,8 +1,7 @@
-# MUSIC GAME UI
+# SyncStream UI
 
-This is a [RainbowKit](https://rainbowkit.com) + [wagmi](https://wagmi.sh) + [Next.js](https://nextjs.org/) project.
+![Referance Homepage](https://user-images.githubusercontent.com/23249402/230786888-b280847f-11d4-479c-a9dc-c9af41d68a18.png)
 
-<img width="1439" alt="Screen Shot 2022-11-13 at 1 44 02 PM" src="https://user-images.githubusercontent.com/23249402/201533339-9444c54c-7d17-4b70-b432-bfc0d9eb9469.png">
 
 ## Getting Started
 
